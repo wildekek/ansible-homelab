@@ -14,13 +14,10 @@ docker_hosts:
     media:
     docker:
     adguard:
-    #living-room-pi:
-    #office-pi:
-
-pi:
-  hosts:
-    living-room-pi:
+    living-room-pi: 
+      ansible_user: pi
     office-pi:
+      ansible_user: pi
 
 pve:
   hosts:
