@@ -1,0 +1,9 @@
+---
+ungrouped:
+  hosts:
+    mail.example.com:
+    media.home.willem.vooijs.eu:
+    docker.home.willem.vooijs.eu:
+    adguard.home.willem.vooijs.eu:
+    living-room-pi.home.willem.vooijs.eu:
+    office-pi.home.willem.vooijs.eu:
