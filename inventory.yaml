@@ -9,6 +9,14 @@ vm:
     docker:
     adguard:
 
+docker_hosts:
+  hosts:
+    media:
+    docker:
+    adguard:
+    #living-room-pi:
+    #office-pi:
+
 pi:
   hosts:
     living-room-pi:
