@@ -1,4 +1,8 @@
 ---
+ungrouped:
+  hosts:
+    pbs:
+
 vm:
   hosts:
     media:
