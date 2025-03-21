@@ -1,9 +1,14 @@
----
-
-- hosts: alpine
+- hosts: all
   become: true
   tasks:
     - name: "Update APK packages"
       community.general.apk:
         update_cache: true
         upgrade: true
+      when: ansible_distribution in ["Alpine"]
+
+    - name: "Update APT packages"
+      apt:
+        update_cache: true
+        upgrade: true
+      when: ansible_distribution in ["Debian"]
