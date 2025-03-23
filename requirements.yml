@@ -1,0 +1,9 @@
+collections:
+  # Install a collection from Ansible Galaxy.
+  - name: community.general
+    version: ">=7.0.0"
+    source: https://galaxy.ansible.com
+  - name: community.docker
+    version: ">=4.5.2"
+    source: https://galaxy.ansible.com
+    
