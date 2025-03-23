@@ -1,0 +1,59 @@
+- name: Cloud Provision
+  hosts: cloudinit
+  become: true
+  become_method: community.general.doas
+  tasks:
+    - name: "Create groups"
+      ansible.builtin.group:
+        name: sudo
+        state: present
+
+    - name: "Create users"
+      ansible.builtin.user:
+        user: willem
+        append: true
+        groups: willem, wheel, sudo
+        comment: "Willem Vooijs"
+
+    - name: "Add public keys"
+      ansible.posix.authorized_key:
+        user: willem
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOg/Z5cn1yTCykFLYmCnEYQ/NQPPeelwqZJ2kNbvWTEb"
+
+    - name: "Set user sudo permissions"
+      ansible.builtin.copy:
+        src: sudo-willem
+        dest: /etc/sudoers.d/10-willem
+        owner: root
+        group: root
+        mode: "440"
+
+    - name: "Use latest-stable Alpine repositories"
+      ansible.builtin.copy:
+        src: alpine-repositories
+        dest: /etc/apk/repositories
+        owner: root
+        group: root
+        mode: "644"
+      when: ansible_distribution == "Alpine"
+
+    - name: "Update packages"
+      ansible.builtin.package:
+        update_cache: true
+        upgrade: true
+
+    - name: "Install packages"
+      ansible.builtin.package:
+        update_cache: false
+        name:
+          - sudo
+          - qemu-guest-agent
+          - nano
+        state: present
+
+    - name: Enable and start qemu-guest-agent on Alpine
+      ansible.builtin.service:
+        name: qemu-guest-agent
+        enabled: true
+        state: started
+      when: ansible_distribution == "Alpine"

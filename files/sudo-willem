@@ -1,0 +1,2 @@
+# User rules for willem
+willem ALL=(ALL) NOPASSWD:ALL

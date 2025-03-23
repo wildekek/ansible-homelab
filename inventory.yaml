@@ -1,9 +1,9 @@
 ---
-ungrouped:
+ungrouped:  
   hosts:
-    pbs:
+    pbs:    
 
-vm:
+cloudinit:
   hosts:
     media:
     docker:
