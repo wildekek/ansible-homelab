@@ -1,0 +1,4 @@
+- name: "Update docker containers"
+  community.docker.docker_compose_v2:
+    project_src: ./docker
+    pull: always

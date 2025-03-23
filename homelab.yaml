@@ -1,0 +1,13 @@
+- name: Preparing
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: "Update repository cache"
+      ansible.builtin.package:
+        update_cache: true
+
+- name: "Docker"
+  hosts: docker_hosts
+  become: false
+  roles:
+    - docker_host
