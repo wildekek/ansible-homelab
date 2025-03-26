@@ -5,9 +5,10 @@
     - name: "Update repository cache"
       ansible.builtin.package:
         update_cache: true
+      changed_when: false
 
 - name: "Docker"
   hosts: docker_hosts
-  become: false
+  become: true
   roles:
     - docker_host
