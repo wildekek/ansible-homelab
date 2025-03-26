@@ -12,3 +12,9 @@
   become: true
   roles:
     - docker_host
+
+- name: "Adguard"
+  hosts: adguard_hosts
+  become: false
+  roles:
+    - adguard

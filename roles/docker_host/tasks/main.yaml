@@ -29,6 +29,14 @@
     append: true
     groups: docker
 
+- name: "Create docker directory"
+  ansible.builtin.file:
+    path: /home/willem/docker
+    state: directory
+    mode: '0755'
+    owner: willem
+    group: willem
+
 # - name: "Update docker containers"
 #   community.docker.docker_compose_v2:
 #     project_src: ./docker

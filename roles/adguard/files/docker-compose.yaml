@@ -1,0 +1,23 @@
+services:
+  adguard:
+    container_name: adguard
+    image: adguard/adguardhome:latest
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      #- "67:67/udp" # DHCP
+      #- "68:68/tcp" # DHCP
+      #- "68:68/udp" # DHCP
+      - "853:853/tcp"
+      - "853:853/udp"
+      - "5443:5443/tcp"
+      - "5443:5443/udp"
+      - "6060:6060/tcp"
+      - 80:80/tcp 
+      #- 443:443/tcp 
+      #- 443:443/udp
+      - "3000:3000/tcp"
+    volumes:
+      - './adguard/work:/opt/adguardhome/work'
+      - './adguard/conf:/opt/adguardhome/conf'

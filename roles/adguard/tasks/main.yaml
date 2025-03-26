@@ -1,0 +1,12 @@
+- name: "Copy docker-compose file"
+  ansible.builtin.copy:
+    src: docker-compose.yaml
+    dest: ~/docker/docker-compose.yaml
+    owner: willem
+    group: willem
+    mode: "644"
+
+- name: "Run docker containers"
+  community.docker.docker_compose_v2:
+    project_src: ./docker
+    pull: always

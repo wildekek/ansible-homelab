@@ -21,6 +21,10 @@ docker_hosts:
     office-pi:
       ansible_user: pi
 
+adguard_hosts:
+  hosts:
+    adguard2:
+
 pve:
   hosts:
     proxmox1:
