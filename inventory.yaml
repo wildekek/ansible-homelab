@@ -8,12 +8,14 @@ cloudinit:
     media:
     docker:
     adguard:
+    adguard2:
 
 docker_hosts:
   hosts:
     media:
     docker:
     adguard:
+    adguard2:
     living-room-pi: 
       ansible_user: pi
     office-pi:
