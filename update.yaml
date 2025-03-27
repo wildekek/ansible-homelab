@@ -1,17 +1,22 @@
-- name: Update packages
+- name: Update base system
   hosts: all
   become: true
+  pre_tasks:
+    - name: "Update repository cache"
+      ansible.builtin.package:
+        update_cache: true
+      changed_when: false
   tasks:
     - name: "Update packages"
       ansible.builtin.package:
-        update_cache: true
+        update_cache: false
         upgrade: true
 
-- name: Update containers
+- name: Update docker containers
   hosts: docker_hosts
   become: false
   tasks:
-    - name: "Update docker containers"
+    - name: "Pull and start containers"
       community.docker.docker_compose_v2:
         project_src: ./docker
         pull: always
