@@ -11,6 +11,10 @@
       ansible.builtin.package:
         update_cache: false
         upgrade: true
+    - name: "Check if reboot required"
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required
 
 - name: Update docker containers
   hosts: docker_hosts
