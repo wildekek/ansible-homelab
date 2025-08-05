@@ -9,6 +9,9 @@ cloudinit:
     docker:
     adguard:
     adguard2:
+    chirpstack-dev:
+    unifios:
+    devcontainers:
 
 docker_hosts:
   hosts:
@@ -16,13 +19,12 @@ docker_hosts:
     docker:
     adguard:
     adguard2:
-    living-room-pi: 
-      ansible_user: pi
-    office-pi:
-      ansible_user: pi
+    chirpstack-dev:
+    devcontainers:
 
 adguard_hosts:
   hosts:
+    adguard:
     adguard2:
 
 pve:
