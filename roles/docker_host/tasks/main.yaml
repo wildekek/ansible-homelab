@@ -1,15 +1,11 @@
-# TODO:
-#  - Docker rootless
-#  - Debian
+- name: Include distribution-specific variables
+  include_vars: "{{ ansible_distribution }}.yaml"
 
-- name: "(Alpine) Install packages"
-  community.general.apk:
+- name: "Install packages"
+  ansible.builtin.package:
     update_cache: false
-    name:
-      - docker
-      - docker-cli-compose
+    name: "{{ docker_packages }}"
     state: present
-  when: ansible_distribution == "Alpine"
 
 - name: (Alpine) Enable and start docker
   ansible.builtin.service:
