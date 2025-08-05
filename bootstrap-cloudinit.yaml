@@ -1,16 +1,16 @@
 - name: Prepare SSH connection
   hosts: cloudinit
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Clean old SSH host keys
       delegate_to: localhost
-      shell: |
+      ansible.builtin.shell: |
         ssh-keygen -R {{ inventory_hostname }} 2>/dev/null || true
       run_once: true
 
     - name: Add fresh SSH host keys
       delegate_to: localhost
-      shell: |
+      ansible.builtin.shell: |
         ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
       run_once: true
 
@@ -19,7 +19,7 @@
   become: true
   pre_tasks:
     - name: Set become method based on OS
-      set_fact:
+      ansible.builtin.set_fact:
         ansible_become_method: "{{ 'community.general.doas' if ansible_os_family == 'Alpine' else 'sudo' }}"
   tasks:
     - name: "Create groups"
@@ -31,7 +31,7 @@
       ansible.builtin.user:
         user: willem
         append: true
-        groups: willem, sudo #wheel
+        groups: willem, sudo
         comment: "Willem Vooijs"
 
     - name: "Add public keys"
