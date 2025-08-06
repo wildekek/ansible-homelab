@@ -9,8 +9,7 @@ cloudinit:
     docker:
     adguard:
     adguard2:
-    chirpstack-dev:
-    unifios:
+    unifi-os:
     devcontainers:
 
 docker_hosts:
@@ -19,7 +18,6 @@ docker_hosts:
     docker:
     adguard:
     adguard2:
-    chirpstack-dev:
     devcontainers:
 
 adguard_hosts:
