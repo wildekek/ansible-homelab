@@ -1,5 +1,5 @@
 - name: Preparing
-  hosts: all
+  hosts: all:!Windows:!status_stopped
   become: true
   pre_tasks:
     - name: "Update repository cache"
@@ -8,25 +8,25 @@
       changed_when: false
 
 - name: "Proxmox backup client"
-  hosts: pbc_hosts
+  hosts: role_pbs_client
   become: true
   roles:
     - proxmox_backup_client
 
 - name: "Docker"
-  hosts: docker_hosts
+  hosts: role_docker
   become: true
   roles:
     - docker_host
 
 - name: "Adguard"
-  hosts: adguard_hosts
+  hosts: role_adguard
   become: false
   roles:
     - adguard
 
 - name: "Labelprinter"
-  hosts: labelprinter_hosts
+  hosts: role_labelprinter
   become: true
   roles:
     - labelprinter

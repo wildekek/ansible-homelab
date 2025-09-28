@@ -1,5 +1,5 @@
 - name: Update base system
-  hosts: all
+  hosts: all:!status_stopped:!Windows:!homeassistant:!media
   become: true
   pre_tasks:
     - name: "Update repository cache"
@@ -17,7 +17,7 @@
       register: reboot_required
 
 - name: Update docker containers
-  hosts: docker_hosts
+  hosts: role_docker
   become: false
   tasks:
     - name: "Pull and start containers"

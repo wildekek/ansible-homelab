@@ -1,0 +1,38 @@
+plugin: community.proxmox.proxmox
+url: https://proxmox1.home.willem.vooijs.eu:8006
+validate_certs: false
+user: ansible@pve
+token_id: ansible
+# token_secret will be read from PROXMOX_TOKEN_SECRET environment variable
+
+# Enable to gather VM/LXC configuration facts
+want_facts: true
+
+# Compose dynamic host variables
+compose:
+  # Use the first IP address found in network configuration
+  ansible_host: proxmox_ipconfig0.ip | default(proxmox_net0.ip) | ipaddr('address')
+  # Override remote user for specific VMs
+  ansible_user: |
+    {%- if inventory_hostname == 'homeassistant' -%}
+    root
+    {%- else -%}
+    willem
+    {%- endif -%}
+
+# Group VMs by their status and roles
+keyed_groups:
+  - key: proxmox_status
+    prefix: status
+  - key: proxmox_type
+    prefix: type
+  - key: proxmox_node
+    prefix: node
+  # Group by individual tags (roles)
+  - key: proxmox_tags_parsed | default([])
+    prefix: role
+    separator: "_"
+
+# Show all VMs/containers (remove status filter)
+# filters:
+#   - proxmox_status == "running"

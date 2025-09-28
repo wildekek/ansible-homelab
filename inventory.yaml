@@ -1,41 +1,25 @@
 ---
-ungrouped:  
-  hosts:
-    pbs:    
-    office-pi:
-
-cloudinit:
-  hosts:
-    media:
-    docker:
-    adguard:
-    adguard2:
-    unifi-os:
-    devcontainers:
-
-pbc_hosts:
+# Machine groups
+physical_machines:
   hosts:
     office-pi:
 
-docker_hosts:
+qnap_containers:
   hosts:
-    media:
-    docker:
-    adguard:
-    adguard2:
-    devcontainers:
-    #office-pi:
+    pbs:
+      ansible_user: root
 
-adguard_hosts:
-  hosts:
-    adguard:
-    adguard2:
-
-labelprinter_hosts:
+# Role groups
+role_pbs_client:
   hosts:
     office-pi:
 
-pve:
+role_labelprinter:
+  hosts:
+    office-pi:
+
+# VM-specific overrides
+vm_overrides:
   hosts:
     proxmox1:
       ansible_user: root
