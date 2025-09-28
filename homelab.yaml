@@ -7,6 +7,12 @@
         update_cache: true
       changed_when: false
 
+- name: "Proxmox backup client"
+  hosts: pbc_hosts
+  become: true
+  roles:
+    - proxmox_backup_client
+
 - name: "Docker"
   hosts: docker_hosts
   become: true
@@ -18,3 +24,9 @@
   become: false
   roles:
     - adguard
+
+- name: "Labelprinter"
+  hosts: labelprinter_hosts
+  become: true
+  roles:
+    - labelprinter

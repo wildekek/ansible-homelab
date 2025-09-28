@@ -2,6 +2,7 @@
 ungrouped:  
   hosts:
     pbs:    
+    office-pi:
 
 cloudinit:
   hosts:
@@ -12,6 +13,10 @@ cloudinit:
     unifi-os:
     devcontainers:
 
+pbc_hosts:
+  hosts:
+    office-pi:
+
 docker_hosts:
   hosts:
     media:
@@ -19,11 +24,16 @@ docker_hosts:
     adguard:
     adguard2:
     devcontainers:
+    #office-pi:
 
 adguard_hosts:
   hosts:
     adguard:
     adguard2:
+
+labelprinter_hosts:
+  hosts:
+    office-pi:
 
 pve:
   hosts:
