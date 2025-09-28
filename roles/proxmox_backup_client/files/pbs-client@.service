@@ -1,0 +1,19 @@
+[Unit]
+Description=Run Backups
+
+[Service]
+Type=oneshot
+#Run as backup
+User=backup
+Group=backup
+#Allow up to 15% CPU
+CPUQuota=15%
+#Backup settings
+Environment=PBS_REPOSITORY='homelab@pbs!office-pi@pbs.home.willem.vooijs.eu:Local'
+Environment=PBS_PASSWORD=52184108-8490-496f-ab91-4e5c45884c95
+Environment=PBS_FINGERPRINT='6c:51:c8:16:28:4e:41:ce:5c:03:b5:b3:32:2d:80:d8:d6:25:5e:b2:a6:3c:af:84:98:94:40:67:ff:56:44:a5'
+#Run proxmox backup client for the passed directory
+ExecStart=proxmox-backup-client backup root.pxar:/ --all-file-systems true --backup-id "%i"
+
+[Install]
+WantedBy=default.target

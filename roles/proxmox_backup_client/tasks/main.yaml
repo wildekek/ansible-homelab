@@ -1,0 +1,52 @@
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: "Install the package"
+  ansible.builtin.include_tasks: "install-{{ ansible_architecture }}.yaml"
+  when: "'proxmox-backup-client' not in ansible_facts.packages"
+
+- name: "Create groups"
+  ansible.builtin.group:
+    name: backup
+    state: present
+
+- name: "Create users"
+  ansible.builtin.user:
+    user: backup
+    append: true
+    groups: backup
+    comment: "I run backups"
+
+- name: Copy servcice
+  ansible.builtin.copy:
+    src: pbs-client@.service
+    dest: /etc/systemd/system/pbs-client@.service
+    owner: root
+    group: root
+    mode: "644"
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+- name: Copy backup timer
+  ansible.builtin.copy:
+    src: pbs-client.timer
+    dest: /etc/systemd/system/pbs-client.timer
+    owner: root
+    group: root
+    mode: "644"
+
+- name: Enable backup timer
+  ansible.builtin.systemd_service:
+    name: pbs-client.timer
+    state: started
+    enabled: true
+
+# - name: Create a cron job
+#  ansible.builtin.cron:
+#    name: "backup"
+#    minute: "0"
+#    hour: "5"
+#    job: "ls -alh > /dev/null"

@@ -1,0 +1,31 @@
+- name: "Install dependencies for ARM64 proxmox-backup-client"
+  ansible.builtin.package:
+    name:
+      - ca-certificates
+      - curl
+      - libssl3
+      - libapt-pkg6.0
+      - libpam0g
+      - zlib1g
+    state: present
+    update_cache: true
+
+- name: "Get latest ARM64 release info"
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/wofferl/proxmox-backup-arm64/releases/latest
+    method: GET
+  register: arm64_release
+
+- name: "Find proxmox-backup-client ARM64 package URL"
+  ansible.builtin.set_fact:
+    client_url: "{{ item.browser_download_url }}"
+    client_name: "{{ item.name }}"
+  loop: "{{ arm64_release.json.assets }}"
+  when: "'proxmox-backup-client' in item.name and 'arm64.deb' in item.name"
+
+- name: "Download and install ARM64 proxmox-backup-client package"
+  ansible.builtin.apt:
+    deb: "{{ client_url }}"
+    state: present
+  when: client_url is defined
+  

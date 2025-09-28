@@ -1,0 +1,12 @@
+[Unit]
+Description=Backup Data
+RefuseManualStart=no
+RefuseManualStop=no
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1w
+Unit=pbs-client@office-pi.service
+
+[Install]
+WantedBy=timers.target

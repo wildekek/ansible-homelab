@@ -1,0 +1,25 @@
+- name: "Add Proxmox Backup Client keyring"
+  ansible.builtin.get_url:
+    url: https://enterprise.proxmox.com/debian/proxmox-archive-keyring-trixie.gpg
+    dest: /usr/share/keyrings/proxmox-archive-keyring.gpg
+    mode: '0644'
+  when: ansible_facts.packages['proxmox-archive-keyring'] is not defined
+
+- name: Add Proxmox Backup Client repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/proxmox-archive-keyring.gpg] http://download.proxmox.com/debian/pbs-client bookworm main"
+    filename: pbs-client
+    state: present
+
+- name: "Update repository cache"
+  ansible.builtin.package:
+    update_cache: true
+  changed_when: false
+
+- name: "Install packages"
+  ansible.builtin.package:
+    update_cache: false
+    name:
+      - proxmox-archive-keyring
+      - proxmox-backup-client
+    state: present
