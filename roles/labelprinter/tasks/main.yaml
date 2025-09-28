@@ -1,0 +1,19 @@
+- name: "Create users"
+  ansible.builtin.user:
+    user: homeassistant
+    append: true
+    groups: homeassistant
+    comment: "Home Assistant"
+
+- name: "Add public keys"
+  ansible.posix.authorized_key:
+    user: homeassistant
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPwxYbUuDI+ZtZxZ79RQlpoBvM/8B1eGmRomMVe95KrW root@core-ssh"
+
+- name: "Install packages"
+  ansible.builtin.package:
+    update_cache: false
+    name:
+      - imagemagick
+      - lprint
+    state: present
