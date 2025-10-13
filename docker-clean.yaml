@@ -1,5 +1,5 @@
 - name: Cleanup docker hosts
-  hosts: docker_hosts
+  hosts: role_docker
   become: false
   tasks:
     - name: "Remove orphans"
