@@ -6,6 +6,9 @@ collections:
   - name: community.docker
     version: ">=4.5.2"
     source: https://galaxy.ansible.com
+  - name: community.proxmox
+    version: ">=1.0.0"
+    source: https://galaxy.ansible.com
   - name: ansible.posix
     version: ">=2.0.0"
     source: https://galaxy.ansible.com

@@ -1,7 +1,28 @@
 - name: Update base system
   hosts: all:!status_stopped:!Windows:!homeassistant:!media
   become: false
+  any_errors_fatal: true
   pre_tasks:
+    - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
+      community.proxmox.proxmox_snap:
+        api_host: "proxmox1.home.willem.vooijs.eu"
+        api_user: ansible@pve
+        api_token_id: ansible
+        api_token_secret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          35643763663638323066353939393265366131333030363438383435343163616239653233303636
+          3461346162623763373466653736643564613065383865660a346461343238393362323239333735
+          63306131363865613765313537353465383630303566653738653764373738646131356463393364
+          6364306161373239370a306461316262616333633934313435643666333930666637653339303839
+          37366135356137393663643330623535663136636662353730363066666266316366383532336435
+          6231366264326533656433613732653438363239313237383235
+        validate_certs: false
+        vmid: "{{ proxmox_vmid }}"
+        state: present
+        snapname: "pre-update-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
+        description: "Pre-update snapshot created by Ansible on {{ ansible_date_time.iso8601 }}"
+      when: proxmox_vmid is defined
+      delegate_to: localhost
     - name: "Update repository cache"
       ansible.builtin.package:
         update_cache: true
