@@ -1,20 +1,37 @@
 - name: Update base system
   hosts: all:!status_stopped:!Windows:!homeassistant:!media
-  become: true
+  become: false
   pre_tasks:
     - name: "Update repository cache"
       ansible.builtin.package:
         update_cache: true
       changed_when: false
+      become: true
+      when: ansible_system != "Darwin"
   tasks:
     - name: "Update packages"
       ansible.builtin.package:
         update_cache: false
         upgrade: true
+      become: true
+      when: ansible_system != "Darwin"
+    - name: "Update Homebrew packages"
+      community.general.homebrew:
+        update_homebrew: true
+        upgrade_all: true
+      when: ansible_system == "Darwin"
+    - name: "Update Homebrew casks"
+      community.general.homebrew_cask:
+        upgrade_all: true
+      when: ansible_system == "Darwin"
+    - name: "Cleanup Homebrew"
+      ansible.builtin.shell: brew cleanup
+      when: ansible_system == "Darwin"
     - name: "Check if reboot required"
       ansible.builtin.stat:
         path: /var/run/reboot-required
       register: reboot_required
+      when: ansible_system != "Darwin"
 
 - name: Update docker containers
   hosts: role_docker
