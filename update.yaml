@@ -7,6 +7,14 @@
     # Semaphore: set PROXMOX_API_TOKEN as environment variable in task
     proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') }}"
   pre_tasks:
+    - name: "Install Python dependencies for Proxmox modules"
+      pip:
+        requirements: "{{ playbook_dir }}/requirements.txt"
+        state: present
+      become: false
+      delegate_to: localhost
+      run_once: true
+
     - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
       when: proxmox_vmid is defined
       community.proxmox.proxmox_snap:
