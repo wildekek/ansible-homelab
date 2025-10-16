@@ -1,5 +1,5 @@
 - name: Update all running hosts
-  hosts: all:!status_stopped:!Windows:!homeassistant
+  hosts: all:!status_stopped:!homeassistant
   become: false
   pre_tasks:
     - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
@@ -60,3 +60,19 @@
           community.docker.docker_compose_v2:
             project_src: ./docker
             pull: always
+  post_tasks:
+    - name: "Cleanup Docker"
+      when: inventory_hostname in groups['role_docker']
+      block:
+        - name: "Remove orphans"
+          community.docker.docker_compose_v2:
+            project_src: ./docker
+            pull: never
+            remove_orphans: true
+        - name: "Prune system"
+          community.docker.docker_prune:
+            containers: true
+            images: true
+            networks: true
+            volumes: true
+            builder_cache: true
