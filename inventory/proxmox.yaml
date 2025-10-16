@@ -21,13 +21,6 @@ compose:
       {%- set parsed = ip | ansible.utils.ipaddr('address') -%}
       {%- if parsed -%}{{ parsed }}{%- else -%}{{ ip.split('/')[0] }}{%- endif -%}
     {%- endif -%}
-  # Override remote user for specific VMs
-  ansible_user: |
-    {%- if inventory_hostname == 'homeassistant' -%}
-    root
-    {%- else -%}
-    willem
-    {%- endif -%}
 
 # Group VMs by their status and roles
 keyed_groups:
