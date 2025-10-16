@@ -1,5 +1,5 @@
 - name: Update all running hosts
-  hosts: all:!status_stopped:!homeassistant
+  hosts: all:!status_stopped:!role_homeassistant
   become: false
   pre_tasks:
     - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
