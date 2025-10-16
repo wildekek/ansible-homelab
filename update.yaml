@@ -3,6 +3,7 @@
   become: false
   pre_tasks:
     - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
+      when: proxmox_vmid is defined
       community.general.proxmox_snap:
         api_host: "proxmox1.home.willem.vooijs.eu"
         api_user: ansible@pve
@@ -21,7 +22,6 @@
         snapname: "pre-update-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
         description: "Pre-update snapshot created by Ansible on {{ ansible_date_time.iso8601 }}"
         retention: 3
-      when: proxmox_vmid is defined
       ignore_errors: true
       register: snapshot_result
       delegate_to: localhost
