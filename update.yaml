@@ -1,5 +1,5 @@
 - name: Update base system
-  hosts: all:!status_stopped:!Windows:!homeassistant:!media
+  hosts: all:!status_stopped:!Windows:!homeassistant
   become: false
   any_errors_fatal: true
   pre_tasks:
