@@ -20,6 +20,7 @@
         state: present
         snapname: "pre-update-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
         description: "Pre-update snapshot created by Ansible on {{ ansible_date_time.iso8601 }}"
+        retention: 3
       when: proxmox_vmid is defined
       ignore_errors: true
       register: snapshot_result
@@ -52,11 +53,10 @@
               community.general.homebrew_cask:
                 upgrade_all: true
 
-- name: Update docker containers
-  hosts: role_docker
-  become: false
-  tasks:
-    - name: "Pull and start containers"
-      community.docker.docker_compose_v2:
-        project_src: ./docker
-        pull: always
+    - name: "Update Docker containers"
+      when: inventory_hostname in groups['role_docker']
+      block:
+        - name: "Pull and start containers"
+          community.docker.docker_compose_v2:
+            project_src: ./docker
+            pull: always
