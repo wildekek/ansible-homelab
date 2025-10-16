@@ -67,3 +67,49 @@ The repository uses a role-based approach where hosts are grouped by function:
 - Python interpreter set to `auto_silent` for compatibility
 - Repository cache updates are performed but marked as `changed_when: false`
 - Host filtering excludes stopped VMs and Windows machines by default
+
+## CI/CD Integration (Semaphore)
+
+### Secret Management Strategy
+
+This repository supports dual secret management to work both locally (with Vault encryption) and in CI/CD environments (with environment variables):
+
+#### Local Development
+- Secrets are encrypted using Ansible Vault (`ansible.cfg` → `.vault_pass`)
+- The `.vault_pass` file is git-ignored (in `.gitignore`)
+- Playbooks reference vault-encrypted variables as defaults
+
+#### Semaphore Configuration
+Instead of storing the vault password in Semaphore, use environment variable override:
+
+1. **In Semaphore Project Settings**, add a Secret:
+   - **Name**: `PROXMOX_API_TOKEN`
+   - **Value**: Your actual Proxmox API token (the decrypted value)
+
+2. **In Semaphore Task Configuration**, set environment variables:
+   ```
+   PROXMOX_API_TOKEN: Use secret 'PROXMOX_API_TOKEN'
+   ```
+
+3. **How it works**:
+   - `inventory/proxmox.yaml:9` - Uses vault-encrypted token (local development only)
+   - `update.yaml:8` - Uses Jinja2 lookup with fallback: `proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') | default(vault_proxmox_api_token, true) }}"`
+   - When `PROXMOX_API_TOKEN` environment variable is set (Semaphore), it takes precedence
+   - When not set (local development), vault decryption is used as fallback
+   - **For inventory discovery**: The Proxmox dynamic inventory plugin will use the vault token locally or can be overridden via environment variable in Semaphore (see Semaphore documentation on how to set env vars for plugins)
+
+### Benefits of This Approach
+
+- **No vault password sharing**: Semaphore never needs the `.vault_pass` file
+- **No duplicate encryption**: Use Vault locally, native secrets in CI/CD
+- **Clean separation**: Local and CI/CD secrets managed independently
+- **Easier rotation**: Change secrets in Semaphore without re-encrypting files
+- **Security**: Each environment has its own isolated secret storage
+
+### Troubleshooting
+
+If Semaphore runs fail with "api_token_secret" errors:
+1. Verify `PROXMOX_API_TOKEN` secret is set in Semaphore
+2. Ensure the secret value is the raw token (not vault-encrypted)
+3. Check environment variables are properly exported in task configuration
+4. Run with `ansible-playbook --check` locally to verify playbook syntax
