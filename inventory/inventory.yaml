@@ -3,9 +3,10 @@
 physical_machines:
   hosts:
     office-pi:
-    MacBookAir:
-      ansible_connection: local
-      ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    #MacBookAir:
+    #  ansible_connection: local
+    #  ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    #qnap:
 
 qnap_containers:
   hosts:
