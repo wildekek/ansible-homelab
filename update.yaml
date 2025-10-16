@@ -26,30 +26,31 @@
       delegate_to: localhost
   tasks:
     - name: "Update system packages"
-      when: ansible_system != "Darwin" and (proxmox_vmid is not defined or snapshot_result is succeeded)
+      when: snapshot_result is succeeded or proxmox_vmid is not defined
       block:
         - name: "Update Linux packages"
-          ansible.builtin.package:
-            update_cache: true
-            upgrade: true
-          become: true
-        - name: "Check if reboot required"
-          ansible.builtin.stat:
-            path: /var/run/reboot-required
-          register: reboot_required
+          when: ansible_system == "Linux"
+          block:
+            - name: "Update packages"
+              ansible.builtin.package:
+                update_cache: true
+                upgrade: true
+              become: true
+            - name: "Check if reboot required"
+              ansible.builtin.stat:
+                path: /var/run/reboot-required
+              register: reboot_required
 
-    - name: "Update macOS packages"
-      when: ansible_system == "Darwin"
-      block:
-        - name: "Update Homebrew packages"
-          community.general.homebrew:
-            update_homebrew: true
-            upgrade_all: true
-        - name: "Update Homebrew casks"
-          community.general.homebrew_cask:
-            upgrade_all: true
-        - name: "Cleanup Homebrew"
-          ansible.builtin.shell: brew cleanup
+        - name: "Update macOS packages"
+          when: ansible_system == "Darwin"
+          block:
+            - name: "Update Homebrew packages"
+              community.general.homebrew:
+                update_homebrew: true
+                upgrade_all: true
+            - name: "Update Homebrew casks"
+              community.general.homebrew_cask:
+                upgrade_all: true
 
 - name: Update docker containers
   hosts: role_docker
