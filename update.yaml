@@ -1,10 +1,9 @@
 - name: Update base system
   hosts: all:!status_stopped:!Windows:!homeassistant
   become: false
-  any_errors_fatal: true
   pre_tasks:
     - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
-      community.proxmox.proxmox_snap:
+      community.general.proxmox_snap:
         api_host: "proxmox1.home.willem.vooijs.eu"
         api_user: ansible@pve
         api_token_id: ansible
@@ -22,6 +21,8 @@
         snapname: "pre-update-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
         description: "Pre-update snapshot created by Ansible on {{ ansible_date_time.iso8601 }}"
       when: proxmox_vmid is defined
+      ignore_errors: true
+      register: snapshot_result
       delegate_to: localhost
     - name: "Update repository cache"
       ansible.builtin.package:
@@ -35,19 +36,19 @@
         update_cache: false
         upgrade: true
       become: true
-      when: ansible_system != "Darwin"
+      when: ansible_system != "Darwin" and (proxmox_vmid is not defined or snapshot_result is succeeded)
     - name: "Update Homebrew packages"
       community.general.homebrew:
         update_homebrew: true
         upgrade_all: true
-      when: ansible_system == "Darwin"
+      when: ansible_system == "Darwin" and (proxmox_vmid is not defined or snapshot_result is succeeded)
     - name: "Update Homebrew casks"
       community.general.homebrew_cask:
         upgrade_all: true
-      when: ansible_system == "Darwin"
+      when: ansible_system == "Darwin" and (proxmox_vmid is not defined or snapshot_result is succeeded)
     - name: "Cleanup Homebrew"
       ansible.builtin.shell: brew cleanup
-      when: ansible_system == "Darwin"
+      when: ansible_system == "Darwin" and (proxmox_vmid is not defined or snapshot_result is succeeded)
     - name: "Check if reboot required"
       ansible.builtin.stat:
         path: /var/run/reboot-required
