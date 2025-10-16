@@ -2,18 +2,10 @@
   hosts: all:!status_stopped:!role_homeassistant
   become: false
   vars:
-    # Support environment variable override for CI/CD environments (e.g., Semaphore)
-    # Local development uses vault encryption; CI/CD uses PROXMOX_API_TOKEN env var
-    # Use environment variable if set, otherwise fall back to vault-encrypted value
-    proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') | default(vault_proxmox_api_token, true) }}"
-    vault_proxmox_api_token: !vault |
-      $ANSIBLE_VAULT;1.1;AES256
-      35643763633638323066353939393265366131333030363438383435343163616239653233303636
-      3461346162623763373466653736643564613065383865660a346461343238393362323239333735
-      63306131363865613765313537353465383630303566653738653764373738646131356463393364
-      6364306161373239370a306461316262616333633934313435643666333930666637653339303839
-      37366135356137393663643330623535663136636662353730363066666266316366383532336435
-      6231366264326533656433613732653438363239313237383235
+    # Proxmox API token from PROXMOX_API_TOKEN environment variable
+    # Local: source load_proxmox_token.sh to set the env var
+    # Semaphore: set PROXMOX_API_TOKEN as environment variable in task
+    proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') }}"
   pre_tasks:
     - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
       when: proxmox_vmid is defined

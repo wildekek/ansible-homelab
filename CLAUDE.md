@@ -72,44 +72,54 @@ The repository uses a role-based approach where hosts are grouped by function:
 
 ### Secret Management Strategy
 
-This repository supports dual secret management to work both locally (with Vault encryption) and in CI/CD environments (with environment variables):
+This repository uses environment variables for Proxmox API tokens, with `load_proxmox_token.sh` script for local development:
+
+#### How It Works
+- **`inventory/proxmox.yaml:9`**: `token_secret: "{{ lookup('env', 'PROXMOX_API_TOKEN') }}"`
+- **`update.yaml:8`**: `proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') }}"`
+- **`load_proxmox_token.sh`**: Local script that sets `PROXMOX_API_TOKEN` env var (git-ignored, not needed in Semaphore)
 
 #### Local Development
-- Secrets are encrypted using Ansible Vault (`ansible.cfg` → `.vault_pass`)
-- The `.vault_pass` file is git-ignored (in `.gitignore`)
-- Playbooks reference vault-encrypted variables as defaults
+Source the script to set the environment variable, then run playbooks:
+```bash
+source ./load_proxmox_token.sh
+ansible-playbook update.yaml
+```
+
+Or set the variable directly:
+```bash
+export PROXMOX_API_TOKEN="your-token-here"
+ansible-playbook update.yaml
+```
+
+To update the token, edit `load_proxmox_token.sh` (git-ignored).
 
 #### Semaphore Configuration
-Instead of storing the vault password in Semaphore, use environment variable override:
+In Semaphore Task Configuration, set this environment variable:
 
-1. **In Semaphore Project Settings**, add a Secret:
-   - **Name**: `PROXMOX_API_TOKEN`
-   - **Value**: Your actual Proxmox API token (the decrypted value)
+- **`PROXMOX_API_TOKEN`**: Your Proxmox API token
 
-2. **In Semaphore Task Configuration**, set environment variables:
-   ```
-   PROXMOX_API_TOKEN: Use secret 'PROXMOX_API_TOKEN'
-   ```
+Semaphore will pass the env var to Ansible, which reads it from the environment - no script needed.
 
-3. **How it works**:
-   - `inventory/proxmox.yaml:9` - Uses vault-encrypted token (local development only)
-   - `update.yaml:8` - Uses Jinja2 lookup with fallback: `proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') | default(vault_proxmox_api_token, true) }}"`
-   - When `PROXMOX_API_TOKEN` environment variable is set (Semaphore), it takes precedence
-   - When not set (local development), vault decryption is used as fallback
-   - **For inventory discovery**: The Proxmox dynamic inventory plugin will use the vault token locally or can be overridden via environment variable in Semaphore (see Semaphore documentation on how to set env vars for plugins)
+### Configuration Details
+
+- **`load_proxmox_token.sh`**: Git-ignored script that exports `PROXMOX_API_TOKEN` (local only)
+- **`.gitignore:5`**: `load_proxmox_token.sh` is git-ignored (keeps secrets out of repo)
+- **`inventory/proxmox.yaml:9`**: Reads `PROXMOX_API_TOKEN` from environment
+- **`update.yaml:8`**: Reads `PROXMOX_API_TOKEN` from environment
 
 ### Benefits of This Approach
 
-- **No vault password sharing**: Semaphore never needs the `.vault_pass` file
-- **No duplicate encryption**: Use Vault locally, native secrets in CI/CD
-- **Clean separation**: Local and CI/CD secrets managed independently
-- **Easier rotation**: Change secrets in Semaphore without re-encrypting files
-- **Security**: Each environment has its own isolated secret storage
+- **Works everywhere**: Environment variables work identically in local and Semaphore
+- **Git-safe**: Script is git-ignored, no secrets in version control
+- **No file dependencies in Semaphore**: Only environment variable needed, no scripts
+- **Easy rotation**: Update token in Semaphore or local script
+- **Clear and transparent**: Token source is explicit in comments
 
 ### Troubleshooting
 
-If Semaphore runs fail with "api_token_secret" errors:
-1. Verify `PROXMOX_API_TOKEN` secret is set in Semaphore
-2. Ensure the secret value is the raw token (not vault-encrypted)
-3. Check environment variables are properly exported in task configuration
-4. Run with `ansible-playbook --check` locally to verify playbook syntax
+If runs fail with token errors:
+1. Verify `PROXMOX_API_TOKEN` is set: `echo $PROXMOX_API_TOKEN`
+2. For local: Run `source ./load_proxmox_token.sh` first
+3. For Semaphore: Check env var is set in task configuration
+4. Ensure the token is valid and active in Proxmox
