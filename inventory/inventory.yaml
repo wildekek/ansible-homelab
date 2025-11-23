@@ -2,7 +2,7 @@
 # Machine groups
 physical_machines:
   hosts:
-    office-pi:
+    #office-pi:
     #MacBookAir:
     #  ansible_connection: local
     #  ansible_python_interpreter: "{{ ansible_playbook_python }}"
@@ -16,11 +16,11 @@ qnap_containers:
 # Role groups
 role_pbs_client:
   hosts:
-    office-pi:
+    #office-pi:
 
 role_labelprinter:
   hosts:
-    office-pi:
+    #office-pi:
 
 # VM-specific overrides
 vm_overrides:

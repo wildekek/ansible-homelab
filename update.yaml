@@ -17,7 +17,7 @@
 
     - name: "Create pre-update snapshot for Proxmox VMs/LXCs"
       when: proxmox_vmid is defined
-      community.proxmox.proxmox_snap:
+      community.general.proxmox_snap:
         api_host: "proxmox1.home.willem.vooijs.eu"
         api_user: ansible@pve
         api_token_id: ansible
