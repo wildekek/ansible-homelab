@@ -1,5 +1,6 @@
 - name: Update all running hosts
   hosts: all:!status_stopped:!role_homeassistant
+  strategy: linear
   become: false
   vars:
     # Proxmox API token from PROXMOX_API_TOKEN environment variable
@@ -8,7 +9,7 @@
     proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') }}"
   pre_tasks:
     - name: "Install Python dependencies for Proxmox modules"
-      pip:
+      ansible.builtin.pip:
         requirements: "{{ playbook_dir }}/requirements.txt"
         state: present
       become: false
