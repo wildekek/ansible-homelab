@@ -2,7 +2,6 @@
 .ansible/
 
 # Security - prevent committing secrets
-load_proxmox_token.sh
 *secret*
 *token*
 *password*
