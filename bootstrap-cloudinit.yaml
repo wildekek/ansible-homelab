@@ -1,5 +1,5 @@
 - name: Prepare SSH connection
-  hosts: cloudinit
+  hosts: all
   gather_facts: false
   tasks:
     - name: Clean old SSH host keys
@@ -15,12 +15,18 @@
       run_once: true
 
 - name: Cloud Provision
-  hosts: cloudinit
+  hosts: all
+  gather_facts: false
   become: true
   pre_tasks:
+    - name: Gather facts without become to detect OS
+      ansible.builtin.setup:
+      become: false
+
     - name: Set become method based on OS
       ansible.builtin.set_fact:
-        ansible_become_method: "{{ 'community.general.doas' if ansible_os_family == 'Alpine' else 'sudo' }}"
+        ansible_become_method: "{{ 'doas' if ansible_facts['os_family'] == 'Alpine' else 'sudo' }}"
+      become: false
   tasks:
     - name: "Create groups"
       ansible.builtin.group:
@@ -54,7 +60,7 @@
         owner: root
         group: root
         mode: "644"
-      when: ansible_distribution == "Alpine"
+      when: ansible_facts['distribution'] == "Alpine"
 
     - name: "Update packages"
       ansible.builtin.package:
@@ -75,4 +81,4 @@
         name: qemu-guest-agent
         enabled: true
         state: started
-      when: ansible_distribution == "Alpine"
+      when: ansible_facts['distribution'] == "Alpine"
