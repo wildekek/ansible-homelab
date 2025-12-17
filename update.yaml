@@ -39,11 +39,30 @@
         - name: "Update Linux packages"
           when: ansible_facts['system'] == "Linux"
           block:
-            - name: "Update packages"
+            - name: "Update packages (apt with dist-upgrade)"
+              ansible.builtin.apt:
+                update_cache: true
+                upgrade: dist
+              become: true
+              when:
+                - ansible_facts['pkg_mgr'] == 'apt'
+                - inventory_hostname in groups['proxmox_hosts']
+
+            - name: "Update packages (apt)"
+              ansible.builtin.apt:
+                update_cache: true
+                upgrade: full
+              become: true
+              when:
+                - ansible_facts['pkg_mgr'] == 'apt'
+                - inventory_hostname not in groups['proxmox_hosts']
+
+            - name: "Update packages (other)"
               ansible.builtin.package:
                 update_cache: true
                 upgrade: true
               become: true
+              when: ansible_facts['pkg_mgr'] != 'apt'
             - name: "Check if reboot required"
               ansible.builtin.stat:
                 path: /var/run/reboot-required

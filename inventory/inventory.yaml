@@ -1,28 +1,18 @@
 ---
-# Machine groups
 physical_machines:
   hosts:
     #office-pi:
     #MacBookAir:
     #  ansible_connection: local
     #  ansible_python_interpreter: "{{ ansible_playbook_python }}"
-    #qnap:
-
-qnap_containers:
-  hosts:
     pbs:
-      ansible_user: root
+    vlantest:
 
-# Role groups
-role_pbs_client:
+proxmox_hosts:
   hosts:
-    #office-pi:
+    proxmox1:
+    pbs:
 
-role_labelprinter:
-  hosts:
-    #office-pi:
-
-# VM-specific overrides
 vm_overrides:
   hosts:
     proxmox1:
