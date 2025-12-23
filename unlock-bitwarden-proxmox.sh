@@ -1,7 +1,7 @@
 #!/bin/bash
 # Load Proxmox API token from Bitwarden
 # This script unlocks the Bitwarden vault and retrieves the token
-# Usage: eval "$(./load_proxmox_token.sh)"
+# Usage: eval "$(./unlock-bitwarden-proxmox.sh)"
 #
 # Requirements:
 #   - bw CLI installed: https://bitwarden.com/help/cli/

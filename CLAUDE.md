@@ -72,27 +72,27 @@ The repository uses a role-based approach where hosts are grouped by function:
 
 ### Secret Management Strategy
 
-This repository uses environment variables for Proxmox API tokens, with `load_proxmox_token.sh` script for local development:
+This repository uses environment variables for Proxmox API tokens, with `unlock-bitwarden-proxmox.sh` script for local development:
 
 #### How It Works
 - **`inventory/proxmox.yaml:9`**: `token_secret: "{{ lookup('env', 'PROXMOX_API_TOKEN') }}"`
 - **`update.yaml:8`**: `proxmox_api_token: "{{ lookup('env', 'PROXMOX_API_TOKEN') }}"`
-- **`load_proxmox_token.sh`**: Local script that sets `PROXMOX_API_TOKEN` env var (git-ignored, not needed in Semaphore)
+- **`unlock-bitwarden-proxmox.sh`**: Script that retrieves the token from Bitwarden and sets `PROXMOX_API_TOKEN` env var (not needed in Semaphore)
 
 #### Local Development
-Source the script to set the environment variable, then run playbooks:
+Use the Bitwarden script to retrieve and set the token, then run playbooks:
 ```bash
-source ./load_proxmox_token.sh
+eval "$(./unlock-bitwarden-proxmox.sh)"
 ansible-playbook update.yaml
 ```
 
-Or set the variable directly:
+Or set the variable directly if you have the token:
 ```bash
 export PROXMOX_API_TOKEN="your-token-here"
 ansible-playbook update.yaml
 ```
 
-To update the token, edit `load_proxmox_token.sh` (git-ignored).
+The script retrieves the token from a Bitwarden item (defaults to "proxmox ansible").
 
 #### Semaphore Configuration
 In Semaphore Task Configuration, set this environment variable:
@@ -103,23 +103,23 @@ Semaphore will pass the env var to Ansible, which reads it from the environment 
 
 ### Configuration Details
 
-- **`load_proxmox_token.sh`**: Git-ignored script that exports `PROXMOX_API_TOKEN` (local only)
-- **`.gitignore:5`**: `load_proxmox_token.sh` is git-ignored (keeps secrets out of repo)
+- **`unlock-bitwarden-proxmox.sh`**: Script that retrieves token from Bitwarden and exports `PROXMOX_API_TOKEN` (tracked in git - contains no secrets)
+- **`.gitignore`**: Uses wildcard patterns (`*token*`, `*secret*`) to ignore files that might contain secrets
 - **`inventory/proxmox.yaml:9`**: Reads `PROXMOX_API_TOKEN` from environment
 - **`update.yaml:8`**: Reads `PROXMOX_API_TOKEN` from environment
 
 ### Benefits of This Approach
 
 - **Works everywhere**: Environment variables work identically in local and Semaphore
-- **Git-safe**: Script is git-ignored, no secrets in version control
+- **Git-safe**: Script retrieves secrets from Bitwarden at runtime, no secrets in version control
 - **No file dependencies in Semaphore**: Only environment variable needed, no scripts
-- **Easy rotation**: Update token in Semaphore or local script
+- **Easy rotation**: Update token in Semaphore or Bitwarden vault
 - **Clear and transparent**: Token source is explicit in comments
 
 ### Troubleshooting
 
 If runs fail with token errors:
 1. Verify `PROXMOX_API_TOKEN` is set: `echo $PROXMOX_API_TOKEN`
-2. For local: Run `source ./load_proxmox_token.sh` first
+2. For local: Run `eval "$(./unlock-bitwarden-proxmox.sh)"` first
 3. For Semaphore: Check env var is set in task configuration
 4. Ensure the token is valid and active in Proxmox

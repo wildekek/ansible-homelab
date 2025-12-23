@@ -20,7 +20,7 @@ Roles support both Debian and Alpine Linux, with automatic detection and OS-spec
 Includes a helper script to retrieve the Proxmox API token from Bitwarden, keeping secrets out of the repository while making local development convenient.
 
 ### CI/CD Ready
-Designed for use with Semaphore or other CI/CD tools. Secrets are managed via environment variables, with git-ignored helper scripts for local development.
+Designed for use with Semaphore or other CI/CD tools. Secrets are managed via environment variables, with a Bitwarden helper script for local development.
 
 ## Quick Start
 
@@ -101,12 +101,11 @@ The `inventory/inventory.yaml` file defines:
 The Proxmox API token is read from the `PROXMOX_API_TOKEN` environment variable:
 
 ```bash
-# Option 1: Set directly
-export PROXMOX_API_TOKEN="your-token-here"
+# Option 1: Use the Bitwarden helper script (retrieves token from Bitwarden vault)
+eval "$(./unlock-bitwarden-proxmox.sh)"
 
-# Option 2: Create a helper script (git-ignored)
-echo 'export PROXMOX_API_TOKEN="your-token-here"' > load_proxmox_token.sh
-source ./load_proxmox_token.sh
+# Option 2: Set directly
+export PROXMOX_API_TOKEN="your-token-here"
 ```
 
 ### Customizing for Your Environment

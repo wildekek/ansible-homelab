@@ -1,0 +1,7 @@
+- name: "Copy shairport config"
+  ansible.builtin.copy:
+    src: shairport-sync.con
+    dest: /etc/shairport-sync
+    owner: root
+    group: root
+    mode: "644"
