@@ -80,8 +80,8 @@
     - name: "Upgrade sendspin"
       when: inventory_hostname in groups['role_sendspin']
       become: true
-      become_user: willem
-      ansible.builtin.command: /home/willem/.local/bin/uv tool upgrade sendspin
+      become_user: sendspin
+      ansible.builtin.command: ~/.local/bin/uv tool upgrade sendspin
       register: sendspin_upgrade
       changed_when: "'Nothing to upgrade' not in sendspin_upgrade.stderr"
 

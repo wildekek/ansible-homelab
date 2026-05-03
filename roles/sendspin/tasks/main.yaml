@@ -1,0 +1,7 @@
+- name: "Copy sendspin config"
+  ansible.builtin.copy:
+    src: settings-daemon.json
+    dest: /home/sendspin/.config/sendspin/settings-daemon.json
+    owner: sendspin
+    group: sendspin
+    mode: "664"
