@@ -39,11 +39,12 @@
         append: true
         groups: sudo
         comment: "Willem Vooijs"
+        password: '*'
 
     - name: "Add willem public key"
       ansible.posix.authorized_key:
         user: willem
-        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOg/Z5cn1yTCykFLYmCnEYQ/NQPPeelwqZJ2kNbvWTEb"
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOg/Z5cn1yTCykFLYmCnEYQ/NQPPeelwqZJ2kNbvWTEb willem@vooijs.eu"
 
     - name: "Create ansible user"
       ansible.builtin.user:
@@ -95,6 +96,7 @@
           - sudo
           - qemu-guest-agent
           - nano
+          - fish
         state: present
 
     - name: Enable and start qemu-guest-agent on Alpine
@@ -105,3 +107,15 @@
       when:
         - ansible_facts['distribution'] == "Alpine"
         - ansible_facts['virtualization_type'] == "kvm"
+
+    - name: Ensure a locale exists
+      community.general.locale_gen:
+        name: en_US.UTF-8
+        state: present
+      when:
+        - ansible_facts['distribution'] == "Debian"
+
+    - name: Change shell to fish
+      ansible.builtin.user:
+        name: "willem"
+        shell: "{{ '/usr/bin/fish' if ansible_facts['os_family'] == 'Alpine' else '/bin/fish' }}"
